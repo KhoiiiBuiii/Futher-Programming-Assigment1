@@ -70,4 +70,59 @@ public class FileHandler {
         return customers;
     }
 
+    public List<InsuranceCard> readInsuranceCardsFromFile(String filePath) {
+        List<InsuranceCard> insuranceCards = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|"); // Using "|" as the delimiter
+                if (parts.length >= 3) { // Ensure there are at least 3 parts
+                    InsuranceCard insuranceCard = new InsuranceCard();
+                    insuranceCard.setCardNumber(parts[0]);
+                    insuranceCard.setCardHolder(parts[1]);
+                    insuranceCard.setPolicyOwner(parts[2]);
+
+                    if (parts.length > 3 && !parts[3].isEmpty()) {
+                        insuranceCard.setExpirationDate(parseDate(parts[3]));
+                    }
+                    insuranceCards.add(insuranceCard);
+                } else {
+                    System.err.println("Invalid insurance card data: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return insuranceCards;
+    }
+
+    public List<Claim> readClaimsFromFile(String filePath) {
+        List<Claim> claims = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|"); // Using "|" as the delimiter
+                if (parts.length >= 8) { // Ensure there are at least 8 parts
+                    Claim claim = new Claim();
+                    claim.setId(parts[0]);
+                    claim.setClaimDateFromString(parts[1]); // Parse claim date
+                    claim.setInsuredPerson(parts[2]);
+                    claim.setCardNumber(parts[3]);
+                    claim.setExamDateFromString(parts[4]); // Parse exam date
+                    claim.setClaimAmount(Double.parseDouble(parts[5]));
+                    claim.setStatus(parts[6]);
+                    claim.setReceiverBankingInfo(parts[7]);
+
+                    claims.add(claim);
+                } else {
+                    System.err.println("Invalid claim data: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return claims;
+    }
+
+
 }
