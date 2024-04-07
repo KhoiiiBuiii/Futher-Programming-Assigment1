@@ -74,5 +74,99 @@ public class Main {
         System.out.print("Enter your choice: ");
     }
 
+    private static void addClaim(List<Customer> customers, List<InsuranceCard> insuranceCards, List<Claim> claims) {
+        System.out.println("Adding a new claim...");
+        Claim newClaim = new Claim();
 
+        newClaim.setId(generateClaimId(claims));
+        newClaim.setClaimDate(parseDate("Enter claim date (YYYY-MM-DD): "));
+        System.out.print("Enter insured person: ");
+        String insuredPerson = scanner.nextLine();
+        newClaim.setInsuredPerson(insuredPerson);
+        System.out.print("Enter card number: ");
+        String cardNumber = scanner.nextLine();
+        newClaim.setCardNumber(cardNumber);
+        newClaim.setExamDate(parseDate("Enter exam date (YYYY-MM-DD): "));
+        System.out.print("Enter claim amount: ");
+        double claimAmount = scanner.nextDouble();
+        newClaim.setClaimAmount(claimAmount);
+        scanner.nextLine(); // Consume newline character
+        System.out.print("Enter status (New, Processing, Done): ");
+        String status = scanner.nextLine();
+        newClaim.setStatus(status);
+        System.out.print("Enter receiver banking info (Bank - Name - Number): ");
+        String receiverBankingInfo = scanner.nextLine();
+        newClaim.setReceiverBankingInfo(receiverBankingInfo);
+
+        claims.add(newClaim);
+        claimProcessManager.add(newClaim);
+
+        System.out.println("Claim added successfully.");
+
+        // Update customer and insurance card information
+        updateCustomerAndInsuranceCard(customers, insuranceCards, newClaim);
+    }
+
+    private static void updateCustomerAndInsuranceCard(List<Customer> customers, List<InsuranceCard> insuranceCards, Claim newClaim) {
+        boolean customerExists = false;
+        for (Customer customer : customers) {
+            if (customer.getInsuranceCard().getCardNumber().equals(newClaim.getCardNumber())) {
+                // Customer exists, update the customer's claims list
+                customerExists = true;
+                customer.getClaims().add(newClaim);
+                break;
+            }
+        }
+
+        if (!customerExists) {
+            // Customer does not exist, create a new customer and insurance card entry
+            Customer newCustomer = new Customer();
+            newCustomer.setId(generateCustomerId());
+            newCustomer.setFullName(newClaim.getInsuredPerson());
+            InsuranceCard newInsuranceCard = new InsuranceCard();
+            newInsuranceCard.setCardNumber(newClaim.getCardNumber());
+            newInsuranceCard.setCardHolder(newClaim.getInsuredPerson());
+            newCustomer.setInsuranceCard(newInsuranceCard);
+            newCustomer.getClaims().add(newClaim);
+
+            customers.add(newCustomer);
+            insuranceCards.add(newInsuranceCard);
+        }
+    }
+
+    private static String generateCustomerId() {
+        StringBuilder idBuilder = new StringBuilder("c-");
+        for (int i = 0; i < 7; i++) {
+            idBuilder.append((int) (Math.random() * 10));
+        }
+        return idBuilder.toString();
+    }
+
+
+    private static String formatDate(Date date) {
+        if (date != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            return dateFormat.format(date);
+        } else {
+            return "N/A";
+        }
+    }
+
+    private static Date parseDate(String message) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        boolean validDate = false;
+        do {
+            System.out.print(message);
+            String dateString = scanner.nextLine();
+            try {
+                dateFormat.setLenient(false); // Disable lenient parsing
+                date = dateFormat.parse(dateString);
+                validDate = true;
+            } catch (ParseException e) {
+                System.out.println("Invalid date format. Please enter date in YYYY-MM-DD format.");
+            }
+        } while (!validDate);
+        return date;
+    }
 }
