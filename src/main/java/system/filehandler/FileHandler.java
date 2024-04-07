@@ -241,5 +241,6 @@ public class FileHandler {
     }
 
 
-
+    public void addClaimToCustomer(List<Customer> customers, String s) {
+    }
 }
