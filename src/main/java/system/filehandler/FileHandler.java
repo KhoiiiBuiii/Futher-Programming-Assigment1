@@ -125,4 +125,70 @@ public class FileHandler {
     }
 
 
+    public void writeCustomersToFile(List<Customer> customers, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Customer customer : customers) {
+                StringBuilder lineBuilder = new StringBuilder();
+                lineBuilder.append(customer.getId()).append("|").append(customer.getFullName()).append("|")
+                        .append(customer.getInsuranceCard().getCardNumber()).append("|")
+                        .append(customer.getInsuranceCard().getPolicyOwner());
+
+                InsuranceCard insuranceCard = customer.getInsuranceCard();
+                if (insuranceCard.getExpirationDate() != null) {
+                    lineBuilder.append("|").append(formatDate(insuranceCard.getExpirationDate()));
+                }
+                if (!customer.getClaims().isEmpty()) {
+                    lineBuilder.append("|");
+                    for (Claim claim : customer.getClaims()) {
+                        lineBuilder.append(claim.getId()).append(",").append(formatDate(claim.getClaimDate())).append(",")
+                                .append(claim.getInsuredPerson()).append(",").append(claim.getCardNumber()).append(",")
+                                .append(formatDate(claim.getExamDate())).append(",").append(claim.getClaimAmount()).append(",")
+                                .append(claim.getStatus()).append(",").append(claim.getReceiverBankingInfo()).append(",");
+                    }
+                    lineBuilder.deleteCharAt(lineBuilder.length() - 1); // Remove the trailing comma
+                }
+                writer.write(lineBuilder.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // Method to parse date string to Date object
+    private Date parseDate(String dateString) {
+        if (dateString != null && !dateString.isEmpty()) {
+            SimpleDateFormat[] dateFormats = {
+                    new SimpleDateFormat("yyyy-MM-dd"),
+                    new SimpleDateFormat("yyyy/MM/dd"),
+                    new SimpleDateFormat("dd/MM/yyyy"),
+                    new SimpleDateFormat("MM/dd/yyyy"),
+                    new SimpleDateFormat("dd-MM-yyyy"),
+                    new SimpleDateFormat("MM-dd-yyyy")
+            };
+
+            for (SimpleDateFormat dateFormat : dateFormats) {
+                try {
+                    return dateFormat.parse(dateString);
+                } catch (ParseException ignored) {
+                    // Try the next date format
+                }
+            }
+
+            System.err.println("Error parsing date: " + dateString + ". Date format not recognized.");
+        }
+        return null;
+    }
+
+
+    // Method to format Date object to string
+    private String formatDate(Date date) {
+        if (date != null) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD");
+            return dateFormat.format(date);
+        } else {
+            return "";
+        }
+    }
 }
