@@ -240,6 +240,53 @@ public class Main {
     }
 
 
+    private static void deleteClaim(List<Claim> claims) {
+        System.out.println("Deleting a claim...");
+        System.out.print("Enter the ID of the claim you want to delete: ");
+        String claimId = scanner.nextLine();
+        Claim claimToDelete = null;
+        for (Claim claim : claims) {
+            if (claim.getId().equals(claimId)) {
+                claimToDelete = claim;
+                break;
+            }
+        }
+
+        if (claimToDelete != null) {
+            claims.remove(claimToDelete);
+            System.out.println("Claim deleted successfully.");
+        } else {
+            System.out.println("Claim not found.");
+        }
+    }
+
+    private static void viewClaim(List<Claim> claims) {
+        System.out.println("Viewing a claim...");
+        System.out.print("Enter the ID of the claim you want to view: ");
+        String claimId = scanner.nextLine();
+        for (Claim claim : claims) {
+            if (claim.getId().equals(claimId)) {
+                System.out.println("Claim Details:");
+                System.out.println("ID: " + claim.getId());
+                System.out.println("Claim Date: " + formatDate(claim.getClaimDate()));
+                System.out.println("Insured Person: " + claim.getInsuredPerson());
+                System.out.println("Card Number: " + claim.getCardNumber());
+                System.out.println("Exam Date: " + formatDate(claim.getExamDate()));
+                System.out.println("Claim Amount: " + claim.getClaimAmount());
+                System.out.println("Status: " + claim.getStatus());
+                System.out.println("Receiver Banking Info: " + claim.getReceiverBankingInfo());
+                return;
+            }
+        }
+        System.out.println("Claim not found.");
+    }
+
+    private static void viewAllClaims(List<Claim> claims) {
+        System.out.println("Viewing all claims...");
+        for (Claim claim : claims) {
+            System.out.println(claim);
+        }
+    }
 
 
     private static String formatDate(Date date) {
