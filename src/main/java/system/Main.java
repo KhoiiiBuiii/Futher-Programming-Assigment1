@@ -106,6 +106,38 @@ public class Main {
         // Update customer and insurance card information
         updateCustomerAndInsuranceCard(customers, insuranceCards, newClaim);
     }
+    private static String generateClaimId(List<Claim> claims) {
+        String prefix = "f-";
+        StringBuilder idBuilder = new StringBuilder(prefix);
+
+        boolean uniqueId = false;
+        while (!uniqueId) {
+            // Generate 10 random numbers
+            for (int i = 0; i < 10; i++) {
+                idBuilder.append((int) (Math.random() * 10));
+            }
+
+            // Check if the generated ID is unique
+            String newClaimId = idBuilder.toString();
+            if (!isClaimIdExists(claims, newClaimId)) {
+                uniqueId = true;
+            } else {
+                // Reset StringBuilder for the next attempt
+                idBuilder.delete(prefix.length(), idBuilder.length());
+            }
+        }
+
+        return idBuilder.toString();
+    }
+
+    private static boolean isClaimIdExists(List<Claim> claims, String newClaimId) {
+        for (Claim claim : claims) {
+            if (claim.getId().equals(newClaimId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static void updateCustomerAndInsuranceCard(List<Customer> customers, List<InsuranceCard> insuranceCards, Claim newClaim) {
         boolean customerExists = false;
@@ -141,38 +173,73 @@ public class Main {
         }
         return idBuilder.toString();
     }
-    private static String generateClaimId(List<Claim> claims) {
-        String prefix = "f-";
-        StringBuilder idBuilder = new StringBuilder(prefix);
 
-        boolean uniqueId = false;
-        while (!uniqueId) {
-            // Generate 10 random numbers
-            for (int i = 0; i < 10; i++) {
-                idBuilder.append((int) (Math.random() * 10));
-            }
+    private static void updateClaim(List<Claim> claims) {
+        System.out.println("Updating a claim...");
+        System.out.print("Enter the ID of the claim you want to update: ");
+        String claimId = scanner.nextLine();
+        Claim claimToUpdate = null;
 
-            // Check if the generated ID is unique
-            String newClaimId = idBuilder.toString();
-            if (!isClaimIdExists(claims, newClaimId)) {
-                uniqueId = true;
-            } else {
-                // Reset StringBuilder for the next attempt
-                idBuilder.delete(prefix.length(), idBuilder.length());
-            }
-        }
-
-        return idBuilder.toString();
-    }
-
-    private static boolean isClaimIdExists(List<Claim> claims, String newClaimId) {
+        // Find the claim with the given ID
         for (Claim claim : claims) {
-            if (claim.getId().equals(newClaimId)) {
-                return true;
+            if (claim.getId().equals(claimId)) {
+                claimToUpdate = claim;
+                break;
             }
         }
-        return false;
+
+        if (claimToUpdate != null) {
+            System.out.println("Claim found. Enter the information you want to update:");
+            System.out.print("New claim date (YYYY-MM-DD): ");
+            String newClaimDate = scanner.nextLine();
+            if (!newClaimDate.isEmpty()) {
+                claimToUpdate.setClaimDateFromString(newClaimDate);
+            }
+
+            System.out.print("New insured person: ");
+            String newInsuredPerson = scanner.nextLine();
+            if (!newInsuredPerson.isEmpty()) {
+                claimToUpdate.setInsuredPerson(newInsuredPerson);
+            }
+
+            System.out.print("New card number: ");
+            String newCardNumber = scanner.nextLine();
+            if (!newCardNumber.isEmpty()) {
+                claimToUpdate.setCardNumber(newCardNumber);
+            }
+
+            System.out.print("New exam date (YYYY-MM-DD): ");
+            String newExamDate = scanner.nextLine();
+            if (!newExamDate.isEmpty()) {
+                claimToUpdate.setExamDateFromString(newExamDate);
+            }
+
+            System.out.print("New claim amount: ");
+            String newClaimAmountStr = scanner.nextLine();
+            if (!newClaimAmountStr.isEmpty()) {
+                double newClaimAmount = Double.parseDouble(newClaimAmountStr);
+                claimToUpdate.setClaimAmount(newClaimAmount);
+            }
+
+            System.out.print("New status (New, Processing, Done): ");
+            String newStatus = scanner.nextLine();
+            if (!newStatus.isEmpty()) {
+                claimToUpdate.setStatus(newStatus);
+            }
+
+            System.out.print("New receiver banking info: ");
+            String newReceiverBankingInfo = scanner.nextLine();
+            if (!newReceiverBankingInfo.isEmpty()) {
+                claimToUpdate.setReceiverBankingInfo(newReceiverBankingInfo);
+            }
+
+            System.out.println("Claim updated successfully.");
+        } else {
+            System.out.println("Claim not found.");
+        }
     }
+
+
 
 
     private static String formatDate(Date date) {
