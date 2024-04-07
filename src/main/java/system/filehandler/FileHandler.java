@@ -155,6 +155,54 @@ public class FileHandler {
         }
     }
 
+    public void writeInsuranceCardsToFile(List<InsuranceCard> insuranceCards, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (InsuranceCard insuranceCard : insuranceCards) {
+                StringBuilder lineBuilder = new StringBuilder();
+                lineBuilder.append(insuranceCard.getCardNumber()).append("|")
+                        .append(insuranceCard.getCardHolder()).append("|")
+                        .append(insuranceCard.getPolicyOwner());
+                if (insuranceCard.getExpirationDate() != null) {
+                    lineBuilder.append("|").append(formatDate(insuranceCard.getExpirationDate()));
+                }
+                writer.write(lineBuilder.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeClaimsToFile(List<Claim> claims, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Claim claim : claims) {
+                String line = claim.getId() + "|" +
+                        formatDate(claim.getClaimDate()) + "|" +
+                        claim.getInsuredPerson() + "|" +
+                        claim.getCardNumber() + "|" +
+                        formatDate(claim.getExamDate()) + "|" +
+                        claim.getClaimAmount() + "|" +
+                        claim.getStatus() + "|" +
+                        claim.getReceiverBankingInfo();
+                // Write other claim fields if needed
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addClaimToCustomer(String customerId, Claim claim, String filePath) {
+        List<Customer> customers = readCustomersFromFile(filePath);
+        for (Customer customer : customers) {
+            if (customer.getId().equals(customerId)) {
+                customer.getClaims().add(claim);
+                break;
+            }
+        }
+        writeCustomersToFile(customers, filePath);
+    }
 
     // Method to parse date string to Date object
     private Date parseDate(String dateString) {
@@ -191,4 +239,7 @@ public class FileHandler {
             return "";
         }
     }
+
+
+
 }
