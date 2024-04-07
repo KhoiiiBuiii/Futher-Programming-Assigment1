@@ -141,6 +141,38 @@ public class Main {
         }
         return idBuilder.toString();
     }
+    private static String generateClaimId(List<Claim> claims) {
+        String prefix = "f-";
+        StringBuilder idBuilder = new StringBuilder(prefix);
+
+        boolean uniqueId = false;
+        while (!uniqueId) {
+            // Generate 10 random numbers
+            for (int i = 0; i < 10; i++) {
+                idBuilder.append((int) (Math.random() * 10));
+            }
+
+            // Check if the generated ID is unique
+            String newClaimId = idBuilder.toString();
+            if (!isClaimIdExists(claims, newClaimId)) {
+                uniqueId = true;
+            } else {
+                // Reset StringBuilder for the next attempt
+                idBuilder.delete(prefix.length(), idBuilder.length());
+            }
+        }
+
+        return idBuilder.toString();
+    }
+
+    private static boolean isClaimIdExists(List<Claim> claims, String newClaimId) {
+        for (Claim claim : claims) {
+            if (claim.getId().equals(newClaimId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     private static String formatDate(Date date) {
